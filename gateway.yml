@@ -36,4 +36,15 @@
         become: yes
         become_method: sudo
         
+      - name: Move maven environment setting script
+        shell: mv /home/demo-user/extras/maven_jdk.sh /etc/profile.d/.
+    
+      - name: Make maven environment setting script executable 
+        shell: chmod +x /etc/profile.d/maven_jdk.sh
+        become: yes
+        become_method: sudo
         
+      - name: Run maven environment setting script
+        shell: source /etc/profile.d/maven_jdk.sh
+        
+    
