@@ -2,24 +2,32 @@
   hosts: gateways
   become: yes
   tasks:
-  - name: Updgrade all packages
+      - name: Upgrade all packages
         yum: name=*
             state=latest
+        
+      - name: Enable Repo (1/2)
+        shell: subscription-manager repos --enable=rhel-7-server-extras-rpms
+
+      - name: Enable Repo (2/2)
+        shell: subscription-manager repos --enable=rhel-7-server-optional-rpms
 
       - name: Install various pre-requisites
-        yum: name=java-1.7.0-openjdk-devel,wget,unzip,git,docker docker-registry,device-mapper-libs,device-mapper-event-libs
+        yum: name=java-1.7.0-openjdk-devel,wget,unzip,git
             state=present
-        become: yes
-        become_method: sudo    
+
+      - name: Install docker
+        yum: name=docker,docker-registry,device-mapper-libs,device-mapper-event-libs
+            state=present
 
       - name: Download Maven
-        get_url: url=http://mirror.olnevhost.net/pub/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip
+        get_url: url=http://mirror.olnevhost.net/pub/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip dest=/home/demo-user/ force=no
         
       - name: Unzip Maven
-        shell: unzip apache-maven-3.3.9-bin.zip
-        
-      - name: Move Maven
-        shell: mv apache-maven-3.3.9/ /opt/
+        shell: unzip /home/demo-user/apache-maven-3.3.9-bin.zip
+
+      - name: Move maven
+        shell: mv /home/demo-user/apache-maven-3.3.9 /opt/
         become: yes
         become_method: sudo
 
@@ -27,3 +35,5 @@
         shell: ln -s /opt/apache-maven-3.3.9/bin/mvn /usr/bin/mvn
         become: yes
         become_method: sudo
+        
+        
